@@ -1,13 +1,19 @@
 import streamlit as st
+import streamlit as st 
+
 # EDA Pkgs
 import pandas as pd 
 import numpy as np 
+
+
 # Data Viz Pkg
 import matplotlib.pyplot as plt 
 import matplotlib
 matplotlib.use("Agg")
 import seaborn as sns 
-from lazypredict.Supervised import LazyRegressor,LazyClassifier
+
+import pandas as pd
+from lazypredict.Supervised import LazyRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
@@ -21,13 +27,6 @@ import io
 ## Page expands to full width
 st.set_page_config(page_title='The Machine Learning Algorithm Comparison App',
     layout='wide')
-st.markdown("<h1 font='IBM Flex Sans'; style='text-align: center; color: black; font-size:29px;'> Automated Machine Learning </h1>", unsafe_allow_html=True)
-st.markdown("<p font='IBM Flex Sans'; style='text-align: center; color: blue; font-size:29px;'> Auto ML applications built on Streamlit</p>", unsafe_allow_html=True)
-st.markdown("""
-<hr style="width:100%;height:3px;background-color:gray;border-width:10">
-""", unsafe_allow_html=True)
-with open('style/style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)  
 def page_2():
 	"""Semi Automated ML App with Streamlit """
 
@@ -117,21 +116,21 @@ def page_2():
 					st.pyplot()    
 
 def page_1(df):
- 
-    df = df.loc[:100] 
-    X = df.iloc[:,:-1]
-    Y = df.iloc[:,-1] 
+    # st.write("This is page 2")
+    df = df.loc[:100] # FOR TESTING PURPOSE, COMMENT THIS OUT FOR PRODUCTION
+    X = df.iloc[:,:-1] # Using all column except for the last column as X
+    Y = df.iloc[:,-1] # Selecting the last column as Y
 
-    st.subheader('**1.2. Dataset dimension**')
-    st.subheader('X')
+    st.markdown('**1.2. Dataset dimension**')
+    st.write('X')
     st.info(X.shape)
-    st.subheader('Y')
+    st.write('Y')
     st.info(Y.shape)
 
-    st.subheader('**1.3. Variable details**:')
-    st.subheader('X variable (first 20 are shown)')
+    st.markdown('**1.3. Variable details**:')
+    st.write('X variable (first 20 are shown)')
     st.info(list(X.columns[:20]))
-    st.subheader('Y variable')
+    st.write('Y variable')
     st.info(Y.name)
 
     # Build lazy model
@@ -142,18 +141,18 @@ def page_1(df):
 
     st.subheader('2. Table of Model Performance')
 
-    st.subheader('Training set')
+    st.write('Training set')
     st.write(predictions_train)
     st.markdown(filedownload(predictions_train,'training.csv'), unsafe_allow_html=True)
 
-    st.subheader('Test set')
+    st.write('Test set')
     st.write(predictions_test)
     st.markdown(filedownload(predictions_test,'test.csv'), unsafe_allow_html=True)
 
     st.subheader('3. Plot of Model Performance (Test set)')
 
 
-    with st.subheader('**R-squared**'):
+    with st.markdown('**R-squared**'):
         # Tall
         predictions_test["R-Squared"] = [0 if i < 0 else i for i in predictions_test["R-Squared"] ]
         plt.figure(figsize=(3, 9))
@@ -170,22 +169,22 @@ def page_1(df):
     st.pyplot(plt)
     st.markdown(imagedownload(plt,'plot-r2-wide.pdf'), unsafe_allow_html=True)
 
-    with st.subheader('**RMSE (capped at 50)**'):
+    with st.markdown('**RMSE (capped at 50)**'):
         # Tall
-        predictions_test["RMSE"] = [50 if i >50  else i for i in predictions_test["RMSE"] ]
+        predictions_test["RMSE"] = [50 if i > 50 else i for i in predictions_test["RMSE"] ]
         plt.figure(figsize=(3, 9))
         sns.set_theme(style="whitegrid")
         ax2 = sns.barplot(y=predictions_test.index, x="RMSE", data=predictions_test)
-    st.markdown(imagedownload(plt,'plot-Accuracy-tall.pdf'), unsafe_allow_html=True)
+    st.markdown(imagedownload(plt,'plot-rmse-tall.pdf'), unsafe_allow_html=True)
         # Wide
     plt.figure(figsize=(9, 3))
     sns.set_theme(style="whitegrid")
     ax2 = sns.barplot(x=predictions_test.index, y="RMSE", data=predictions_test)
     plt.xticks(rotation=90)
     st.pyplot(plt)
-    st.markdown(imagedownload(plt,'plot-RMSE-wide.pdf'), unsafe_allow_html=True)
+    st.markdown(imagedownload(plt,'plot-rmse-wide.pdf'), unsafe_allow_html=True)
 
-    with st.subheader('**Calculation time**'):
+    with st.markdown('**Calculation time**'):
         # Tall
         predictions_test["Time Taken"] = [0 if i < 0 else i for i in predictions_test["Time Taken"] ]
         plt.figure(figsize=(3, 9))
@@ -215,43 +214,56 @@ def imagedownload(plt, filename):
 
 #---------------------------------#
 st.title("Multi-Page Streamlit App")
-menu = ["clean_dataset 1", "data_preprocessing 2", "data_visualization 3","ML Model Selector 4","Automl Regression 5","Automl classification 6"]
+menu = ["clean_dataset 1", "data_preprocessing 2", "data_visualization 3","ML Model Selector 4","Automl 4"]
 choice = st.sidebar.selectbox("Select a page", menu)
 
 #---------------------------------#
 # Sidebar - Collects user input features into dataframe
-if choice == "Automl Regression 5":
+if choice == "Automl 4":
     with st.sidebar.header('1. Upload your CSV data'):
         uploaded_file = st.sidebar.file_uploader("Upload your input CSV file", type=["csv"])
     # Sidebar - Specify parameter settings
     with st.sidebar.header('2. Set Parameters'):
         split_size = st.sidebar.slider('Data split ratio (% for Training Set)', 10, 90, 80, 5)
         seed_number = st.sidebar.slider('Set the random seed number', 1, 100, 42, 1)
-        st.subheader('1. Dataset')
-        st.subheader(" upload your file ")
 
-        if uploaded_file is not None:
-            df = pd.read_csv(uploaded_file)
-elif choice =="Automl classification 6":
-    with st.sidebar.header('1. Upload your CSV data'):
-        uploaded_file = st.sidebar.file_uploader("Upload your input CSV file", type=["csv"])
-    # Sidebar - Specify parameter settings
-    with st.sidebar.header('2. Set Parameters'):
-        split_size = st.sidebar.slider('Data split ratio (% for Training Set)', 10, 90, 80, 5)
-        seed_number = st.sidebar.slider('Set the random seed number', 1, 100, 42, 1)
 
     #---------------------------------#
     # Main panel
 
     # Displays the dataset
     st.subheader('1. Dataset')
-    st.subheader(" upload your file ")
 
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
+    # st.markdown('**1.1. Glimpse of dataset**')
+    # st.write(df)
+# else:
+#     st.info('Awaiting for CSV file to be uploaded.')
+#     if st.button('Press to use Example Dataset'):
+        # Diabetes dataset
+        #diabetes = load_diabetes()
+        #X = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
+        #Y = pd.Series(diabetes.target, name='response')
+        #df = pd.concat( [X,Y], axis=1 )
 
+        #st.markdown('The Diabetes dataset is used as the example.')
+        #st.write(df.head(5))
+
+        # # Boston housing dataset
+        # boston = load_boston()
+        # #X = pd.DataFrame(boston.data, columns=boston.feature_names)
+        # #Y = pd.Series(boston.target, name='response')
+        # X = pd.DataFrame(boston.data, columns=boston.feature_names).loc[:100] # FOR TESTING PURPOSE, COMMENT THIS OUT FOR PRODUCTION
+        # Y = pd.Series(boston.target, name='response').loc[:100] # FOR TESTING PURPOSE, COMMENT THIS OUT FOR PRODUCTION
+        # df = pd.concat( [X,Y], axis=1 )
+
+        # st.markdown('The Boston housing dataset is used as the example.')
+        # st.write(df.head(5))    
+        # page_1(df)
 def page_3():
     
+    # st.set_page_config(page_title="Data Cleaning App", page_icon=":mag_right:", layout="wide")
     st.title("Data Cleaning App")
 
     uploaded_file = st.file_uploader("Upload your dataset", type=["csv", "txt", "xlsx"])
@@ -289,9 +301,14 @@ def page_3():
         # Download cleaned data
         if st.checkbox("Download Cleaned Dataset"):
             score_model =data.to_csv(index=False).encode('utf-8')
+# data = {'Laptop Manufacturer Brand': brand,'Budget':budget,'RAM':ram,'Processor Type':processor,'Storage Type':storage,'Models Available':models}
+# df = pd.DataFrame(data, columns=['Laptop Manufacturer Brand','Budget','RAM','Processor Type','Storage Type','Models Available'])
             if st.download_button(label='download',data=score_model, mime='text/csv' ,file_name= 'cleaned_data.csv'):
                 st.success('done')
-
+            # if st.download_button("download csv"):
+            #     file_name = "cleaned_data.csv"
+            #     data.to_csv(file_name, index=False)
+            #     st.write("Downloaded as", file_name)
 def page_4():
     from sklearn.preprocessing import LabelEncoder
 
@@ -324,6 +341,8 @@ def page_4():
             st.subheader("Encoded Data")
             st.write(data)
             score_model =data.to_csv(index=False).encode('utf-8')
+    # data = {'Laptop Manufacturer Brand': brand,'Budget':budget,'RAM':ram,'Processor Type':processor,'Storage Type':storage,'Models Available':models}
+    # df = pd.DataFrame(data, columns=['Laptop Manufacturer Brand','Budget','RAM','Processor Type','Storage Type','Models Available'])
             if st.download_button(label='download',data=score_model, mime='text/csv' ,file_name= 'mlt_data.csv'):
                 st.success('done')
 
@@ -389,114 +408,17 @@ def page_5():
         elif dataset[target_column].dtype == 'datetime64[ns]':
             dataset_type = 'timeseries'
         if dataset_type is None:
-            st.subheader("Invalid target column type. Must be one of: object, int64, float64, datetime64[ns]")
+            st.write("Invalid target column type. Must be one of: object, int64, float64, datetime64[ns]")
         else:
-            st.subheader(f"Detected dataset type: {dataset_type}")
+            st.write(f"Detected dataset type: {dataset_type}")
             best_model, accuracy = train_and_evaluate_model(dataset, target_column, dataset_type)
-            st.subheader(f"Best model: {type(best_model).__name__}")
-            st.subheader(f"Accuracy: {accuracy}")
-
-
-def page_6(df):
- 
-    df = df.loc[:100] 
-    X = df.iloc[:,:-1]
-    Y = df.iloc[:,-1] 
-
-    st.subheader('**1.2. Dataset dimension**')
-    st.subheader('X')
-    st.info(X.shape)
-    st.subheader('Y')
-    st.info(Y.shape)
-
-    st.subheader('**1.3. Variable details**:')
-    st.subheader('X variable (first 20 are shown)')
-    st.info(list(X.columns[:20]))
-    st.subheader('Y variable')
-    st.info(Y.name)
-
-    # Build lazy model
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y,test_size = split_size,random_state = seed_number)
-    reg = LazyClassifier(verbose=0,ignore_warnings=False, custom_metric=None)
-    models_train,predictions_train = reg.fit(X_train, X_train, Y_train, Y_train)
-    models_test,predictions_test = reg.fit(X_train, X_test, Y_train, Y_test)
-
-    st.subheader('2. Table of Model Performance')
-
-    st.subheader('Training set')
-    st.write(predictions_train)
-    st.markdown(filedownload(predictions_train,'training.csv'), unsafe_allow_html=True)
-
-    st.subheader('Test set')
-    st.write(predictions_test)
-    st.markdown(filedownload(predictions_test,'test.csv'), unsafe_allow_html=True)
-
-    st.subheader('3. Plot of Model Performance (Test set)')
-
-
-    # with st.subheader('**R-squared**'):
-    #     # Tall
-    #     predictions_test["R-Squared"] = [0 if i < 0 else i for i in predictions_test["R-Squared"] ]
-    #     plt.figure(figsize=(3, 9))
-    #     sns.set_theme(style="whitegrid")
-    #     ax1 = sns.barplot(y=predictions_test.index, x="R-Squared", data=predictions_test)
-    #     ax1.set(xlim=(0, 1))
-    # st.markdown(imagedownload(plt,'plot-r2-tall.pdf'), unsafe_allow_html=True)
-    #     # Wide
-    # plt.figure(figsize=(9, 3))
-    # sns.set_theme(style="whitegrid")
-    # ax1 = sns.barplot(x=predictions_test.index, y="R-Squared", data=predictions_test)
-    # ax1.set(ylim=(0, 1))
-    # plt.xticks(rotation=90)
-    # st.pyplot(plt)
-    # st.markdown(imagedownload(plt,'plot-r2-wide.pdf'), unsafe_allow_html=True)
-
-    with st.subheader('**Accuracy (capped at 50)**'):
-        # Tall
-        predictions_test["Accuracy"] = [50 if i > 50 else i for i in predictions_test["Accuracy"] ]
-        st.write(predictions_test.nlargest(5,['Time Taken']))
-        plt.figure(figsize=(3, 9))
-        sns.set_theme(style="whitegrid")
-        ax2 = sns.barplot(y=predictions_test.index, x="Accuracy", data=predictions_test)
-    st.markdown(imagedownload(plt,'plot-rmse-tall.pdf'), unsafe_allow_html=True)
-        # Wide
-    plt.figure(figsize=(9, 3))
-    sns.set_theme(style="whitegrid")
-    ax2 = sns.barplot(x=predictions_test.index, y="Accuracy", data=predictions_test)
-    plt.xticks(rotation=90)
-    st.pyplot(plt)
-    st.markdown(imagedownload(plt,'plot-Accuracy-wide.pdf'), unsafe_allow_html=True)
-
-    with st.subheader('**Calculation time**'):
-        # Tall
-        predictions_test["Time Taken"] = [0 if i < 0 else i for i in predictions_test["Time Taken"] ]
-        st.write(predictions_test.nlargest(5,['Time Taken']))
-        plt.figure(figsize=(3, 9))
-        sns.set_theme(style="whitegrid")
-        ax3 = sns.barplot(y=predictions_test.index, x="Time Taken", data=predictions_test)
-    st.markdown(imagedownload(plt,'plot-calculation-time-tall.pdf'), unsafe_allow_html=True)
-        # Wide
-    plt.figure(figsize=(9, 3))
-    sns.set_theme(style="whitegrid")
-    ax3 = sns.barplot(x=predictions_test.index, y="Time Taken", data=predictions_test)
-    plt.xticks(rotation=90)
-    st.pyplot(plt)
-    st.markdown(imagedownload(plt,'plot-calculation-time-wide.pdf'), unsafe_allow_html=True)
-def filedownload(df, filename):
-    csv = df.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()  # strings <-> bytes conversions
-    href = f'<a href="data:file/csv;base64,{b64}" download={filename}>Download {filename} File</a>'
-    return href
-
-def imagedownload(plt, filename):
-    s = io.BytesIO()
-    plt.savefig(s, format='pdf', bbox_inches='tight')
-    plt.close()
-    b64 = base64.b64encode(s.getvalue()).decode()  # strings <-> bytes conversions
-    href = f'<a href="data:image/png;base64,{b64}" download={filename}>Download {filename} File</a>'
-    return href
+            st.write(f"Best model: {type(best_model).__name__}")
+            st.write(f"Accuracy: {accuracy}")
 
 def main():
+    # st.title("Multi-Page Streamlit App")
+    # menu = ["clean_dataset 1", "data_preprocessing 2", "data_visualization 3","ML Model Selector 4","Automl 4"]
+    # choice = st.sidebar.selectbox("Select a page", menu)
 
     if choice == "data_visualization 3":
         page_2()
@@ -504,16 +426,11 @@ def main():
         page_4()
     elif choice == "clean_dataset 1":
         page_3()
-    elif choice =="Automl Regression 5":
+    elif choice =="Automl 4":
         try:
             page_1(df)
         except:
             st.write("upload the csv file....")
-    elif choice =="Automl classification 6":
-        try:
-            page_6(df)
-        except:
-            st.write("please upload the csv file")
     else:
         page_5()
 if __name__ == "__main__":
