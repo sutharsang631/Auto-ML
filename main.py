@@ -267,22 +267,22 @@ def page_3():
 
         # Fill missing values with mean
         if st.checkbox("Fill Missing Values with Mean"):
-            mean = data.mean()
-            data.fillna(mean, inplace=True)
+            mean1 = data.mean()
+            data.fillna(mean1, inplace=True)
             st.write("Missing values filled with mean")
             st.write(data.isnull().sum())
 
         # Fill missing values with median
         if st.checkbox("Fill Missing Values with Median"):
-            median = data.median()
-            data.fillna(median, inplace=True)
+            median1 = data.median()
+            data.fillna(median1, inplace=True)
             st.write("Missing values filled with median")
             st.write(data.isnull().sum())
 
         # Fill missing values with mode
         if st.checkbox("Fill Missing Values with Mode"):
-            mode = data.mode().iloc[0]
-            data.fillna(mode, inplace=True)
+            mode1 = data.mode().iloc[0]
+            data.fillna(mode1, inplace=True)
             st.write("Missing values filled with mode")
             st.write(data.isnull().sum())
 
